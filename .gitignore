@@ -131,3 +131,6 @@ dmypy.json
 2020A.xlsx
 inputs.csv
 labels.csv
+2020B.xlsx
+~$2020B.xlsx
+~$2020A.xlsx
