@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 import os
-
+from icecream import ic
 
 def import_data_from_origin_file():
     data = pd.read_excel('2020A.xlsx').values
@@ -12,7 +12,7 @@ def import_data_from_origin_file():
     labels = []
     for stock_id in stock_ids:
         stock_time_line = data[data[:, 2] == stock_id]
-        if stock_time_line[0,14] == 0:
+        if stock_time_line[:,17:].all() > 0 and stock_time_line[0,14] == 0 and stock_time_line[:,17:21].max() < 100:
             # 停牌的股票这一项为444016000，未停牌的股票为这一项0。
             for index in range(stock_time_line.shape[0] // 31):
                 inputs.extend(stock_time_line[index * 31: index * 31 + 30, 17:])
@@ -33,5 +33,5 @@ def import_data():
 
 if __name__ == '__main__':
     if not os.path.exists('inputs.csv'):
-        import_data_from_origin_file() 
+        import_data_from_origin_file()
     import_data()
