@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+2020A.xlsx
+inputs.csv
+labels.csv
