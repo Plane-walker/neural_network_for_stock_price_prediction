@@ -23,7 +23,7 @@ def import_data_from_origin_file():
                     break
             temp_count += 1
         stock_time_line = np.delete(stock_time_line, temp_list, axis=0)
-        if stock_time_line[0, 14] == 0 and stock_time_line[:, 17:21].max() < 100:
+        if stock_time_line.__len__()>0 and stock_time_line[:, 17:21].max() < 100:
             if count == 0 and stock_time_line.shape[0] // 31 > 1:
                 long_term_inputs.extend(stock_time_line[0: 30, 17:])
                 for index in range(30, 61):
