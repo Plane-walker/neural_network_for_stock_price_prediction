@@ -50,7 +50,6 @@ def main():
         y_predict_long_term = np.insert(y_predict_long_term, y_predict_long_term.shape[0], values=[model.predict(x_long_term)[0, 0]], axis=0)
     plt.plot(y_long_term, label='Stock Price')
     plt.plot(y_predict_long_term, label='Predicted Stock Price')
-    print(y_long_term, y_predict_long_term)
     plt.title('Stock Price Prediction')
     plt.xlabel('Time')
     plt.ylabel('Price')
