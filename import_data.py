@@ -11,16 +11,29 @@ def import_data_from_origin_file():
     for stock_id in stock_ids:
         stock_time_line = data[data[:, 2] == stock_id]
         #stock_time_line是每支股票的全年大概242天的相关记录，包括开盘，收盘等等
-        temp_bool = True
+        temp_list = []
+        count = 0
         for i in stock_time_line[:,17:]:
-            if i[0] <= 0:
-                temp_bool = False
-                break
-        if temp_bool and stock_time_line[0,14] == 0 and stock_time_line[:,17:21].max() < 100:
+            for j in i:
+                if j < 0:
+                    temp_list.append(count)
+                    temp_bool = False
+                    break
+            count += 1
+        temp_result = np.delete(stock_time_line[:,17:], temp_list, axis=0)
+
+        temp_bool = True
+        for i in temp_result:
+            for j in i[:4]:
+                if j > 100:
+                    temp_bool = False
+                    break
+
+        if temp_bool:
             # 停牌的股票这一项为444016000，未停牌的股票为这一项0。
-            for index in range(stock_time_line.shape[0] // 31):
-                inputs.extend(stock_time_line[index * 31: index * 31 + 30, 17:])
-                labels.extend([[stock_time_line[index * 31 + 30, 17]]])
+            for index in range(len(temp_result) // 31):
+                inputs.extend(temp_result[index * 31: index * 31 + 30][:4])
+                labels.extend([[temp_result[index * 31 + 30][0]]])
     inputs = np.array(inputs)
     labels = np.array(labels)
     pd.DataFrame(inputs).to_csv('inputs.csv', index=False, header=False)
@@ -36,6 +49,7 @@ def import_data():
 
 
 if __name__ == '__main__':
-    if not os.path.exists('inputs.csv'):
-        import_data_from_origin_file()
-    import_data()
+    # if not os.path.exists('inputs.csv'):
+    #     import_data_from_origin_file()
+    # import_data()
+    import_data_from_origin_file()
