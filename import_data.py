@@ -14,12 +14,16 @@ def import_data_from_origin_file():
     count = 0
     for stock_id in stock_ids:
         stock_time_line = data[data[:, 2] == stock_id]
-        temp_bool = True
+        temp_list = []
+        temp_count = 0
         for i in stock_time_line[:, 17:]:
-            if i[0] <= 0:
-                temp_bool = False
-                break
-        if temp_bool and stock_time_line[0, 14] == 0 and stock_time_line[:, 17:21].max() < 100:
+            for j in i:
+                if j <= 0:
+                    temp_list.append(temp_count)
+                    break
+            temp_count += 1
+        stock_time_line = np.delete(stock_time_line, temp_list, axis=0)
+        if stock_time_line.__len__()>0 and stock_time_line[:, 17:21].max() < 100:
             if count == 0 and stock_time_line.shape[0] // 31 > 1:
                 long_term_inputs.extend(stock_time_line[0: 30, 17:])
                 for index in range(30, 61):
