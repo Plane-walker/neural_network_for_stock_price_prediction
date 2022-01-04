@@ -13,10 +13,9 @@ def import_data_from_origin_file():
         #stock_time_line是每支股票的全年大概242天的相关记录，包括开盘，收盘等等
         temp_bool = True
         for i in stock_time_line[:,17:]:
-            for j in i:
-                if j <= 0:
-                    temp_bool = False
-                    break
+            if i[0] <= 0:
+                temp_bool = False
+                break
         if temp_bool and stock_time_line[0,14] == 0 and stock_time_line[:,17:21].max() < 100:
             # 停牌的股票这一项为444016000，未停牌的股票为这一项0。
             for index in range(stock_time_line.shape[0] // 31):
