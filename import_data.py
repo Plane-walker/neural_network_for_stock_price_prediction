@@ -53,6 +53,4 @@ def import_data():
 
 
 if __name__ == '__main__':
-    a = np.array([[[1, 2, 3], [2, 3, 4]]])
-    b = np.delete(a, 0, axis=1)
-    print(np.insert(b, b.shape[1], values=[4, 7, 8], axis=1))
+    import_data_from_origin_file()
