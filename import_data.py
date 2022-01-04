@@ -1,41 +1,58 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-import os
+
 
 def import_data_from_origin_file():
     data = pd.read_excel('2020A.xlsx').values
     stock_ids = np.unique(data[:, 2])
+    np.random.shuffle(stock_ids)
     inputs = []
     labels = []
+    long_term_inputs = []
+    long_term_labels = []
+    count = 0
     for stock_id in stock_ids:
         stock_time_line = data[data[:, 2] == stock_id]
-        #stock_time_line是每支股票的全年大概242天的相关记录，包括开盘，收盘等等
         temp_bool = True
-        for i in stock_time_line[:,17:]:
+        for i in stock_time_line[:, 17:]:
             if i[0] <= 0:
                 temp_bool = False
                 break
-        if temp_bool and stock_time_line[0,14] == 0 and stock_time_line[:,17:21].max() < 100:
-            # 停牌的股票这一项为444016000，未停牌的股票为这一项0。
-            for index in range(stock_time_line.shape[0] // 31):
-                inputs.extend(stock_time_line[index * 31: index * 31 + 30, 17:])
-                labels.extend([[stock_time_line[index * 31 + 30, 17]]])
+        if temp_bool and stock_time_line[0, 14] == 0 and stock_time_line[:, 17:21].max() < 100:
+            if count == 0 and stock_time_line.shape[0] // 31 > 1:
+                long_term_inputs.extend(stock_time_line[0: 30, 17:])
+                for index in range(30, 61):
+                    long_term_labels.extend([[stock_time_line[index, 17]]])
+                count += 1
+            else:
+                for index in range(stock_time_line.shape[0] // 31):
+                    inputs.extend(stock_time_line[index * 31: index * 31 + 30, 17:])
+                    labels.extend([[stock_time_line[index * 31 + 30, 17]]])
     inputs = np.array(inputs)
     labels = np.array(labels)
     pd.DataFrame(inputs).to_csv('inputs.csv', index=False, header=False)
     pd.DataFrame(labels).to_csv('labels.csv', index=False, header=False)
+    pd.DataFrame(long_term_inputs).to_csv('long_term_inputs.csv', index=False, header=False)
+    pd.DataFrame(long_term_labels).to_csv('long_term_labels.csv', index=False, header=False)
 
 
 def import_data():
     inputs = pd.read_csv('inputs.csv', sep=',', header=None).values
     labels = pd.read_csv('labels.csv', sep=',', header=None).values
-    print(labels[(labels[:, 0] > 1500)])
+    long_term_x = pd.read_csv('long_term_inputs.csv', sep=',', header=None).values
+    long_term_y = pd.read_csv('long_term_labels.csv', sep=',', header=None).values
     inputs = inputs.reshape(-1, 30, 10)
-    return train_test_split(inputs, labels, test_size=0.2)
+    long_term_x = long_term_x.reshape(-1, 30, 10)
+    train_ratio = 0.75
+    validation_ratio = 0.15
+    test_ratio = 0.10
+    x_train, x_test, y_train, y_test = train_test_split(inputs, labels, test_size=1 - train_ratio)
+    x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, test_size=test_ratio/(test_ratio + validation_ratio))
+    return x_train, x_val, x_test, long_term_x, y_train, y_val, y_test, long_term_y
 
 
 if __name__ == '__main__':
-    if not os.path.exists('inputs.csv'):
-        import_data_from_origin_file()
-    import_data()
+    a = np.array([[[1, 2, 3], [2, 3, 4]]])
+    b = np.delete(a, 0, axis=1)
+    print(np.insert(b, b.shape[1], values=[4, 7, 8], axis=1))
