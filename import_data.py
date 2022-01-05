@@ -14,12 +14,12 @@ def import_data_from_origin_file():
     count = 0
     for stock_id in stock_ids:
         stock_time_line = (data[data[:, 2] == stock_id])[:, 17:]
-        abnormal_index = np.unique(np.concatenate((np.argwhere(stock_time_line < 0)[:, 0], np.argwhere(stock_time_line[:, 0: 4] > 200)[:, 0]), axis=0))
+        abnormal_index = np.unique(np.concatenate((np.argwhere(stock_time_line < 0)[:, 0], np.argwhere(stock_time_line[:, 0: 4] > 100)[:, 0]), axis=0))
         drop = False
         for index in abnormal_index:
             if index == 0 or index == stock_time_line.shape[0] - 1:
                 continue
-            if np.any(stock_time_line[index, 0: 4] > 200):
+            if np.any(stock_time_line[index, 0: 4] > 100):
                 drop = True
                 break
             if np.any(stock_time_line[index - 1] < 0) or np.any(stock_time_line[index + 1] < 0):
