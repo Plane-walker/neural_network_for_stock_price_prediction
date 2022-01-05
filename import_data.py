@@ -13,26 +13,34 @@ def import_data_from_origin_file():
     long_term_labels = []
     count = 0
     for stock_id in stock_ids:
-        stock_time_line = data[data[:, 2] == stock_id]
-        temp_list = []
-        temp_count = 0
-        for i in stock_time_line[:, 17:]:
-            for j in i:
-                if j <= 0:
-                    temp_list.append(temp_count)
-                    break
-            temp_count += 1
-        stock_time_line = np.delete(stock_time_line, temp_list, axis=0)
-        if stock_time_line.__len__()>0 and stock_time_line[:, 17:21].max() < 100:
-            if count == 0 and stock_time_line.shape[0] // 31 > 1:
-                long_term_inputs.extend(stock_time_line[0: 30, 17:])
-                for index in range(30, 61):
-                    long_term_labels.extend([[stock_time_line[index, 17]]])
-                count += 1
-            else:
-                for index in range(stock_time_line.shape[0] // 31):
-                    inputs.extend(stock_time_line[index * 31: index * 31 + 30, 17:])
-                    labels.extend([[stock_time_line[index * 31 + 30, 17]]])
+        stock_time_line = (data[data[:, 2] == stock_id])[:, 17:]
+        abnormal_index = np.unique(np.concatenate((np.argwhere(stock_time_line < 0)[:, 0], np.argwhere(stock_time_line[:, 0: 4] > 200)[:, 0]), axis=0))
+        drop = False
+        for index in abnormal_index:
+            if index == 0 or index == stock_time_line.shape[0] - 1:
+                continue
+            if np.any(stock_time_line[index, 0: 4] > 200):
+                drop = True
+                break
+            if np.any(stock_time_line[index - 1] < 0) or np.any(stock_time_line[index + 1] < 0):
+                drop = True
+                break
+            stock_time_line[index] = (stock_time_line[index - 1] + stock_time_line[index + 1]) / 2
+        if drop:
+            continue
+        if np.any(stock_time_line[0] < 0):
+            stock_time_line = np.delete(stock_time_line, 0, axis=0)
+        if np.any(stock_time_line[stock_time_line.shape[0] - 1] < 0):
+            stock_time_line = np.delete(stock_time_line, stock_time_line.shape[0] - 1, axis=0)
+        if count == 0 and stock_time_line.shape[0] // 31 > 1:
+            long_term_inputs.extend(stock_time_line[0: 30, :])
+            for index in range(30, 61):
+                long_term_labels.extend([[stock_time_line[index, 0]]])
+            count += 1
+        else:
+            for index in range(stock_time_line.shape[0] // 31):
+                inputs.extend(stock_time_line[index * 31: index * 31 + 30, :])
+                labels.extend([[stock_time_line[index * 31 + 30, 0]]])
     inputs = np.array(inputs)
     labels = np.array(labels)
     pd.DataFrame(inputs).to_csv('inputs.csv', index=False, header=False)
