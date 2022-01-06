@@ -23,7 +23,7 @@ def main():
     plt.plot(history.history['loss'], label='MSE (training data)')
     plt.plot(history.history['val_loss'], label='MSE (validation data)')
     plt.axhline(test_loss, linestyle='--', label='MSE (test data)')
-    plt.title('MSE for Chennai Reservoir Levels')
+    plt.title('MSE for Stock Price Prediction')
     plt.ylabel('MSE value')
     plt.xlabel('No. epoch')
     plt.legend(loc="upper left")
