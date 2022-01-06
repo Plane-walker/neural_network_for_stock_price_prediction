@@ -10,11 +10,12 @@ def main():
     model = tf.keras.Sequential([
         GRU(80, return_sequences=True),
         Dropout(0.2),
-        GRU(100),
+        GRU(120, return_sequences=True),
         Dropout(0.2),
+        GRU(100),
         Dense(1)
     ])
-    model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
+    model.compile(optimizer='rmsprop',
                   loss='mean_squared_error')
     history = model.fit(x_train, y_train, validation_data=(x_val, y_val), batch_size=64, epochs=50)
     y_predict = model.predict(x_test)
