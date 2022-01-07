@@ -1,5 +1,5 @@
 # neural_network_for_stock_price_prediction
-Neural networks for stock price prediction.
+Using Neural networks for stock price prediction.
 
 ## requirements
 * python == 3.8.12
